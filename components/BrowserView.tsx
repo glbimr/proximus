@@ -13,10 +13,28 @@ interface BrowserViewProps {
 const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefresh, isLoading }) => {
   const [inputUrl, setInputUrl] = useState(url);
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [proxyUrl, setProxyUrl] = useState<string | null>(null);
   
   useEffect(() => {
     setInputUrl(url);
   }, [url]);
+
+  // Simulate proxy behavior - in real implementation, this would route through actual proxies
+  useEffect(() => {
+    if (config && url) {
+      // In simulation mode, we keep the original URL
+      // Real implementation would use: /api/proxy?url=${url}&location=${config.location}
+      setProxyUrl(url);
+    } else {
+      setProxyUrl(null);
+    }
+  }, [config, url]);
+
+  // Simulate different loading times based on config
+  const getSimulatedLoadTime = () => {
+    if (!config) return 800;
+    return config.latency + Math.random() * 200; // Add some variance
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -78,9 +96,18 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
       <div className="flex-1 bg-slate-800 flex justify-center items-start overflow-auto p-4 relative">
         {/* Connection Overlay */}
         {config && (
-            <div className="absolute top-6 right-6 z-10 bg-black/80 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-lg">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                Routed via {config.provider} ({config.ip})
+            <div className="absolute top-6 right-6 z-10 bg-black/90 text-white text-xs px-4 py-2 rounded-lg backdrop-blur-md border border-white/10 shadow-lg max-w-xs">
+                <div className="flex items-center gap-2 mb-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span className="font-medium">Routed via {config.provider}</span>
+                </div>
+                <div className="text-slate-300 text-xs">
+                    IP: {config.ip} • {config.location}
+                </div>
+                <div className="mt-1 text-yellow-400 text-xs flex items-center gap-1">
+                    <span>⚠️</span>
+                    <span>Simulation Mode - See README for real proxy setup</span>
+                </div>
             </div>
         )}
 
@@ -101,7 +128,7 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
             Extended permissions for WebRTC and screen sharing support within the simulated browser.
           */}
           <iframe 
-            src={url}
+            src={proxyUrl || url}
             className="w-full h-full border-none"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-presentation allow-top-navigation-by-user-activation"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; microphone; camera; geolocation; display-capture"

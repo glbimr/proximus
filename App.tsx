@@ -15,15 +15,17 @@ const App: React.FC = () => {
   const handleConfigSelect = (config: IPConfig) => {
     setIsLoading(true);
     setSelectedConfig(config);
-    // Simulate network switch delay
+    // Simulate network switch delay based on config latency
+    const switchTime = config.latency * 5 + 800; // Scale for realistic switching time
     setTimeout(() => {
       setIsLoading(false);
-    }, 1200);
+    }, switchTime);
   };
 
   const handleRefresh = () => {
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 800);
+    const loadTime = selectedConfig ? selectedConfig.latency * 10 + 500 : 800; // Scale latency for realistic feel
+    setTimeout(() => setIsLoading(false), loadTime);
   };
 
   return (
