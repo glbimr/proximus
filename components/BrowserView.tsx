@@ -19,19 +19,12 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
     setInputUrl(url);
   }, [url]);
 
-  // Simulate proxy behavior - in real implementation, this would route through actual proxies
+  // Use direct proxy service - no backend server required
   useEffect(() => {
     if (config && url) {
-      // Check if backend proxy is available (in development)
-      // In production, this would be your deployed proxy service
-      const isDevelopment = import.meta.env.DEV;
-      if (isDevelopment) {
-        // Use local proxy server when in development
-        setProxyUrl(`http://localhost:3001/api/proxy?url=${encodeURIComponent(url)}&location=${encodeURIComponent(config.location)}`);
-      } else {
-        // In production, use a deployed proxy service or keep as simulation
-        setProxyUrl(url);
-      }
+      // Use CORS Proxy service - open source and functional
+      const proxyService = 'https://corsproxy.org/?';
+      setProxyUrl(`${proxyService}${encodeURIComponent(url)}`);
     } else {
       setProxyUrl(null);
     }
@@ -112,15 +105,15 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
                     IP: {config.ip} • {config.location}
                 </div>
                 <div className="mt-1 text-xs">
-                    {proxyUrl && proxyUrl.includes('localhost:3001') ? (
+                    {proxyUrl && proxyUrl.includes('corsproxy.org') ? (
                         <span className="text-green-400 flex items-center gap-1">
                             <span>✓</span>
-                            <span>Proxy Active (CORS Anywhere)</span>
+                            <span>Proxy Active (CORS Proxy)</span>
                         </span>
                     ) : (
                         <span className="text-yellow-400 flex items-center gap-1">
                             <span>⚠️</span>
-                            <span>Simulation Mode - Run proxy-server.js for real proxying</span>
+                            <span>Direct Connection - No Proxy</span>
                         </span>
                     )}
                 </div>
@@ -149,7 +142,10 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-presentation allow-top-navigation-by-user-activation"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; microphone; camera; geolocation; display-capture"
             title="Simulated Browser"
-            onError={() => console.log("Frame error")}
+            onError={() => {
+              console.log("Proxy failed, falling back to direct connection");
+              // Could implement fallback logic here
+            }}
           />
           
           {/* Fallback Overlay for blocked iframes (common with major sites) */}

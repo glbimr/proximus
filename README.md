@@ -34,44 +34,30 @@ View your app in AI Studio: https://ai.studio/apps/drive/1RU-A9Qp3ovJMb42SPdnVmF
 
 ## IP Routing Implementation
 
-**Current Status**: The app now supports functional proxying using CORS Anywhere (open source proxy service).
+**Current Status**: The app now uses CORS Proxy (https://corsproxy.org/) - a functional open source proxy service that works without requiring a backend server.
 
-**To Enable Real IP Changing**:
+**How it works**:
+- Requests are automatically routed through CORS Proxy when an ISP configuration is selected
+- No additional setup or server required
+- Provides basic proxying and CORS bypass functionality
 
-1. **Start the Proxy Server**:
-   ```bash
-   # Install proxy dependencies
-   npm install express express-http-proxy cors dotenv
+**For Advanced IP Changing**:
+- The included `proxy-server.js` provides a customizable backend solution
+- Commercial services like Bright Data or Oxylabs offer true residential IP rotation
 
-   # Run the proxy server
-   node proxy-server.js
-   ```
-
-2. **The app will automatically detect and use the proxy** when running in development mode.
-
-3. **For Production**: Deploy the proxy server separately and update the proxy URL in `BrowserView.tsx`.
-
-### Example Backend Implementation (Node.js/Express):
+### Example Direct Proxy Usage:
 
 ```javascript
-import express from 'express';
-import proxy from 'express-http-proxy';
-import cors from 'cors';
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.use('/api/proxy', proxy('https://cors-anywhere.herokuapp.com', {
-  proxyReqPathResolver: (req) => {
-    const url = req.query.url;
-    return `/${encodeURIComponent(url)}`;
-  }
-}));
+// Frontend automatically uses:
+const proxyUrl = `https://corsproxy.org/?${encodeURIComponent(targetUrl)}`;
 ```
 
-### Frontend Integration:
+### Backend Proxy (Optional):
 
-The frontend automatically detects when the proxy server is running and routes requests through it.
+For more control, you can still use the included proxy server:
 
-See `PROXY_SETUP.md` and `proxy-server.js` for complete implementation details.
+```bash
+node proxy-server.js
+```
+
+See `PROXY_SETUP.md` for complete backend implementation details.
