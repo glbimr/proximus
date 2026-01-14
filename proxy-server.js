@@ -30,16 +30,9 @@ app.use('/api/proxy', (req, res, next) => {
     return res.status(400).json({ error: 'URL parameter is required' });
   }
 
-  // Use CORS Anywhere as the proxy service
-  // Note: CORS Anywhere doesn't change IP addresses, but provides proxying
-  // For real IP changing, use commercial services like Bright Data or Oxylabs
-  const corsAnywhereUrl = 'https://cors-anywhere.herokuapp.com';
-
-  proxy(corsAnywhereUrl, {
-    proxyReqPathResolver: (proxyReq) => {
-      // CORS Anywhere expects the target URL as a path
-      return `/${encodeURIComponent(targetUrl)}`;
-    },
+  // Directly proxy to the target URL - no external proxy service needed
+  // This provides reliable proxying with custom headers
+  proxy(targetUrl, {
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Add custom headers to simulate different locations
       const proxyHeaders = {
@@ -48,7 +41,7 @@ app.use('/api/proxy', (req, res, next) => {
         'X-Client-IP': mockIPs[location] || '127.0.0.1',
         'User-Agent': 'Mozilla/5.0 (GeoNet Simulator)',
         'Accept-Language': location && location.includes('India') ? 'en-IN,en;q=0.9' : 'en-US,en;q=0.9',
-        'X-Requested-With': 'XMLHttpRequest' // Required by CORS Anywhere
+        'Referer': targetUrl, // Add referer to avoid blocking
       };
 
       proxyReqOpts.headers = {
@@ -61,9 +54,13 @@ app.use('/api/proxy', (req, res, next) => {
       // Add custom headers to response
       userRes.setHeader('X-Proxied-Location', location || 'Unknown');
       userRes.setHeader('X-Simulated-IP', mockIPs[location] || '127.0.0.1');
-      userRes.setHeader('X-Proxy-Service', 'CORS Anywhere (Open Source)');
+      userRes.setHeader('X-Proxy-Service', 'Direct Proxy');
+      userRes.setHeader('Access-Control-Allow-Origin', '*');
+      userRes.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      userRes.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       return proxyResData;
-    }
+    },
+    changeOrigin: true, // Changes the origin of the host header to the target URL
   })(req, res, next);
 });
 

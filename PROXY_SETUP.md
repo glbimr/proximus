@@ -2,19 +2,19 @@
 
 ## Current Implementation (Recommended)
 
-The app now uses **CORS Proxy** (https://www.corsproxy.com/) - a reliable free proxy service designed for iframe embedding that properly renders HTML content.
+The app now uses a **local proxy server** that directly proxies requests to target websites with proper headers and CORS handling.
 
 ### Features:
-- ✅ **No backend required** - works out of the box
+- ✅ **Direct proxying** - no external service dependencies
 - ✅ **Automatic proxying** when ISP configs are selected
 - ✅ **CORS bypass** for cross-origin requests
-- ✅ **Proper HTML rendering** in iframes (not raw HTML code)
-- ✅ **Open source** and free to use
+- ✅ **Proper HTML rendering** in iframes
+- ✅ **Custom headers** for location simulation
 
 ### How it works:
 ```javascript
 // When an ISP config is selected, URLs are automatically proxied:
-const proxyUrl = `https://www.corsproxy.com/?${encodeURIComponent(targetUrl)}`;
+const proxyUrl = `http://localhost:3001/api/proxy?url=${encodeURIComponent(targetUrl)}&location=${config.location}`;
 ```
 
 ## Alternative: Backend Proxy Server

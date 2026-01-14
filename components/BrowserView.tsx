@@ -20,12 +20,12 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
     setInputUrl(url);
   }, [url]);
 
-  // Use direct proxy service - no backend server required
+  // Use local proxy server for reliable functionality
   useEffect(() => {
     if (config && url) {
-      // Use CORS Proxy service - designed for iframe embedding
-      const proxyService = 'https://www.corsproxy.com/?';
-      setProxyUrl(`${proxyService}${encodeURIComponent(url)}`);
+      // Use local proxy server - more reliable than external services
+      const proxyService = 'http://localhost:3001/api/proxy?url=';
+      setProxyUrl(`${proxyService}${encodeURIComponent(url)}&location=${encodeURIComponent(config.location)}`);
       setProxyError(false);
     } else {
       setProxyUrl(null);
@@ -108,10 +108,10 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
                     IP: {config.ip} • {config.location}
                 </div>
                 <div className="mt-1 text-xs">
-                    {proxyUrl && proxyUrl.includes('corsproxy.com') ? (
+                    {proxyUrl && proxyUrl.includes('localhost:3001') ? (
                         <span className="text-green-400 flex items-center gap-1">
                             <span>✓</span>
-                            <span>Proxy Active (CORS Proxy)</span>
+                            <span>Proxy Active (Local Server)</span>
                         </span>
                     ) : proxyError ? (
                         <span className="text-orange-400 flex items-center gap-1">

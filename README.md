@@ -34,22 +34,28 @@ View your app in AI Studio: https://ai.studio/apps/drive/1RU-A9Qp3ovJMb42SPdnVmF
 
 ## IP Routing Implementation
 
-**Current Status**: The app now uses CORS Proxy (https://www.corsproxy.com/) - a reliable free proxy service designed for iframe embedding that properly renders HTML content.
+**Current Status**: The app uses a local proxy server for reliable website loading.
 
 **How it works**:
-- Requests are automatically routed through CORS Proxy when an ISP configuration is selected
-- No additional setup or server required
-- Properly serves HTML content for iframe rendering (not raw HTML code)
+1. Start the proxy server: `node proxy-server.js`
+2. The app automatically detects and uses the local proxy when ISP configurations are selected
+3. Websites load properly through the controlled proxy environment
+
+**Setup Required**:
+```bash
+# Start the proxy server
+npm run proxy
+```
 
 **For Advanced IP Changing**:
-- The included `proxy-server.js` provides a customizable backend solution
 - Commercial services like Bright Data or Oxylabs offer true residential IP rotation
+- The local proxy can be extended to use these services
 
-### Example Direct Proxy Usage:
+### Example Proxy Usage:
 
 ```javascript
 // Frontend automatically uses:
-const proxyUrl = `https://www.corsproxy.com/?${encodeURIComponent(targetUrl)}`;
+const proxyUrl = `http://localhost:3001/api/proxy?url=${encodeURIComponent(targetUrl)}&location=${config.location}`;
 ```
 
 ### Backend Proxy (Optional):
