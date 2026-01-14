@@ -34,12 +34,12 @@ View your app in AI Studio: https://ai.studio/apps/drive/1RU-A9Qp3ovJMb42SPdnVmF
 
 ## IP Routing Implementation
 
-**Current Status**: The app now uses CodeTabs Proxy (https://api.codetabs.com/v1/proxy) - a reliable free proxy service that works without requiring a backend server.
+**Current Status**: The app now uses CORS Proxy (https://www.corsproxy.com/) - a reliable free proxy service designed for iframe embedding that properly renders HTML content.
 
 **How it works**:
-- Requests are automatically routed through CodeTabs Proxy when an ISP configuration is selected
+- Requests are automatically routed through CORS Proxy when an ISP configuration is selected
 - No additional setup or server required
-- Provides basic proxying and CORS bypass functionality
+- Properly serves HTML content for iframe rendering (not raw HTML code)
 
 **For Advanced IP Changing**:
 - The included `proxy-server.js` provides a customizable backend solution
@@ -49,7 +49,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1RU-A9Qp3ovJMb42SPdnVmF
 
 ```javascript
 // Frontend automatically uses:
-const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
+const proxyUrl = `https://www.corsproxy.com/?${encodeURIComponent(targetUrl)}`;
 ```
 
 ### Backend Proxy (Optional):

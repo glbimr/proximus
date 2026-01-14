@@ -2,18 +2,19 @@
 
 ## Current Implementation (Recommended)
 
-The app now uses **CodeTabs Proxy** (https://api.codetabs.com/v1/proxy) - a reliable free proxy service that works directly without requiring any backend setup.
+The app now uses **CORS Proxy** (https://www.corsproxy.com/) - a reliable free proxy service designed for iframe embedding that properly renders HTML content.
 
 ### Features:
 - ✅ **No backend required** - works out of the box
 - ✅ **Automatic proxying** when ISP configs are selected
 - ✅ **CORS bypass** for cross-origin requests
-- ✅ **Reliable** and free to use
+- ✅ **Proper HTML rendering** in iframes (not raw HTML code)
+- ✅ **Open source** and free to use
 
 ### How it works:
 ```javascript
 // When an ISP config is selected, URLs are automatically proxied:
-const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
+const proxyUrl = `https://www.corsproxy.com/?${encodeURIComponent(targetUrl)}`;
 ```
 
 ## Alternative: Backend Proxy Server
@@ -41,11 +42,23 @@ node proxy-server.js
 
 ## Alternative Proxy Services
 
-### 1. CodeTabs Proxy (Current)
+### 1. CORS Proxy (Current)
+```javascript
+const proxyUrl = `https://www.corsproxy.com/?${encodeURIComponent(url)}`;
+```
+**Status**: ✅ Currently in use - designed for iframe embedding
+
+### 2. CodeTabs Proxy
 ```javascript
 const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
 ```
-**Status**: ✅ Currently in use - reliable and functional
+**Note**: Returns content directly but may display HTML as text in some cases
+
+### 3. CORS Anywhere
+```javascript
+const proxyUrl = `https://cors-anywhere.herokuapp.com/${encodeURIComponent(url)}`;
+```
+**Note**: Requires visiting https://cors-anywhere.herokuapp.com/corsdemo to enable
 
 ### 2. CORS Anywhere
 ```javascript

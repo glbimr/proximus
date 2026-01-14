@@ -23,8 +23,8 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
   // Use direct proxy service - no backend server required
   useEffect(() => {
     if (config && url) {
-      // Use CodeTabs proxy service - reliable free proxy
-      const proxyService = 'https://api.codetabs.com/v1/proxy?quest=';
+      // Use CORS Proxy service - designed for iframe embedding
+      const proxyService = 'https://www.corsproxy.com/?';
       setProxyUrl(`${proxyService}${encodeURIComponent(url)}`);
       setProxyError(false);
     } else {
@@ -108,10 +108,10 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
                     IP: {config.ip} • {config.location}
                 </div>
                 <div className="mt-1 text-xs">
-                    {proxyUrl && !proxyError && proxyUrl.includes('codetabs.com') ? (
+                    {proxyUrl && proxyUrl.includes('corsproxy.com') ? (
                         <span className="text-green-400 flex items-center gap-1">
                             <span>✓</span>
-                            <span>Proxy Active (CodeTabs)</span>
+                            <span>Proxy Active (CORS Proxy)</span>
                         </span>
                     ) : proxyError ? (
                         <span className="text-orange-400 flex items-center gap-1">
@@ -153,6 +153,10 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
             onError={() => {
               console.log("Proxy failed, falling back to direct connection");
               setProxyError(true);
+            }}
+            onLoad={() => {
+              // Reset error state on successful load
+              setProxyError(false);
             }}
           />
           
