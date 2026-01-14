@@ -1,0 +1,8 @@
+{
+  "name": "GeoNet Simulator",
+  "description": "A professional IP address simulator and website testing tool allowing developers to simulate browsing contexts from various ISPs like Airtel, Jio, and others to test website behavior and localization.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
