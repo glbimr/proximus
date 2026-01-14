@@ -1,14 +1,14 @@
 import { GoogleGenAI } from "@google/genai";
 import { IPConfig } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || '' });
 
 export const analyzeNetworkContext = async (
   url: string,
   config: IPConfig
 ): Promise<string> => {
-  if (!process.env.API_KEY) {
-    return "API Key missing. Please set REACT_APP_GEMINI_API_KEY to use AI diagnostics.";
+  if (!import.meta.env.VITE_GEMINI_API_KEY) {
+    return "API Key missing. Please set GEMINI_API_KEY environment variable to use AI diagnostics.";
   }
 
   try {

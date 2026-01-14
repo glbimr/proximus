@@ -67,7 +67,7 @@ export const useGeminiLive = ({ config }: UseGeminiLiveProps) => {
       setError("No ISP Configuration Selected");
       return;
     }
-    if (!process.env.API_KEY) {
+    if (!import.meta.env.VITE_GEMINI_API_KEY) {
       setError("API Key missing");
       return;
     }
@@ -76,7 +76,7 @@ export const useGeminiLive = ({ config }: UseGeminiLiveProps) => {
       setIsActive(true);
       setError(null);
 
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
       
       // Initialize Audio Contexts
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
