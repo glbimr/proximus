@@ -22,9 +22,16 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
   // Simulate proxy behavior - in real implementation, this would route through actual proxies
   useEffect(() => {
     if (config && url) {
-      // In simulation mode, we keep the original URL
-      // Real implementation would use: /api/proxy?url=${url}&location=${config.location}
-      setProxyUrl(url);
+      // Check if backend proxy is available (in development)
+      // In production, this would be your deployed proxy service
+      const isDevelopment = import.meta.env.DEV;
+      if (isDevelopment) {
+        // Use local proxy server when in development
+        setProxyUrl(`http://localhost:3001/api/proxy?url=${encodeURIComponent(url)}&location=${encodeURIComponent(config.location)}`);
+      } else {
+        // In production, use a deployed proxy service or keep as simulation
+        setProxyUrl(url);
+      }
     } else {
       setProxyUrl(null);
     }
@@ -104,9 +111,18 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
                 <div className="text-slate-300 text-xs">
                     IP: {config.ip} • {config.location}
                 </div>
-                <div className="mt-1 text-yellow-400 text-xs flex items-center gap-1">
-                    <span>⚠️</span>
-                    <span>Simulation Mode - See README for real proxy setup</span>
+                <div className="mt-1 text-xs">
+                    {proxyUrl && proxyUrl.includes('localhost:3001') ? (
+                        <span className="text-green-400 flex items-center gap-1">
+                            <span>✓</span>
+                            <span>Proxy Active (CORS Anywhere)</span>
+                        </span>
+                    ) : (
+                        <span className="text-yellow-400 flex items-center gap-1">
+                            <span>⚠️</span>
+                            <span>Simulation Mode - Run proxy-server.js for real proxying</span>
+                        </span>
+                    )}
                 </div>
             </div>
         )}

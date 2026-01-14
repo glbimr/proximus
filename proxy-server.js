@@ -1,7 +1,9 @@
-const express = require('express');
-const proxy = require('express-http-proxy');
-const cors = require('cors');
-require('dotenv').config();
+import express from 'express';
+import proxy from 'express-http-proxy';
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -28,21 +30,27 @@ app.use('/api/proxy', (req, res, next) => {
     return res.status(400).json({ error: 'URL parameter is required' });
   }
 
-  // In real implementation, use a proxy service like Bright Data
-  // For now, we'll simulate by adding headers
-  const proxyHeaders = {
-    'X-Forwarded-For': mockIPs[location] || '127.0.0.1',
-    'X-Real-IP': mockIPs[location] || '127.0.0.1',
-    'X-Client-IP': mockIPs[location] || '127.0.0.1',
-    'User-Agent': 'Mozilla/5.0 (GeoNet Simulator)',
-    'Accept-Language': location.includes('India') ? 'en-IN,en;q=0.9' : 'en-US,en;q=0.9'
-  };
+  // Use CORS Anywhere as the proxy service
+  // Note: CORS Anywhere doesn't change IP addresses, but provides proxying
+  // For real IP changing, use commercial services like Bright Data or Oxylabs
+  const corsAnywhereUrl = 'https://cors-anywhere.herokuapp.com';
 
-  // Use a proxy service or direct request
-  // This is a simplified example - real implementation would use residential proxies
-  proxy(targetUrl, {
+  proxy(corsAnywhereUrl, {
+    proxyReqPathResolver: (proxyReq) => {
+      // CORS Anywhere expects the target URL as a path
+      return `/${encodeURIComponent(targetUrl)}`;
+    },
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Add custom headers to simulate different locations
+      const proxyHeaders = {
+        'X-Forwarded-For': mockIPs[location] || '127.0.0.1',
+        'X-Real-IP': mockIPs[location] || '127.0.0.1',
+        'X-Client-IP': mockIPs[location] || '127.0.0.1',
+        'User-Agent': 'Mozilla/5.0 (GeoNet Simulator)',
+        'Accept-Language': location && location.includes('India') ? 'en-IN,en;q=0.9' : 'en-US,en;q=0.9',
+        'X-Requested-With': 'XMLHttpRequest' // Required by CORS Anywhere
+      };
+
       proxyReqOpts.headers = {
         ...proxyReqOpts.headers,
         ...proxyHeaders
@@ -51,8 +59,9 @@ app.use('/api/proxy', (req, res, next) => {
     },
     userResDecorator: (proxyRes, proxyResData, userReq, userRes) => {
       // Add custom headers to response
-      userRes.setHeader('X-Proxied-Location', location);
+      userRes.setHeader('X-Proxied-Location', location || 'Unknown');
       userRes.setHeader('X-Simulated-IP', mockIPs[location] || '127.0.0.1');
+      userRes.setHeader('X-Proxy-Service', 'CORS Anywhere (Open Source)');
       return proxyResData;
     }
   })(req, res, next);

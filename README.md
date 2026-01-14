@@ -34,34 +34,44 @@ View your app in AI Studio: https://ai.studio/apps/drive/1RU-A9Qp3ovJMb42SPdnVmF
 
 ## IP Routing Implementation
 
-**Current Status**: This application runs in simulation mode only. The iframe loads websites directly from your IP address.
+**Current Status**: The app now supports functional proxying using CORS Anywhere (open source proxy service).
 
 **To Enable Real IP Changing**:
 
-1. **Backend Proxy Service**: Implement a backend API that routes requests through residential proxies
-2. **Proxy Integration**: Use services like Bright Data, Oxylabs, or Smart Proxy for residential IPs
-3. **API Endpoint**: Create `/api/proxy?url={url}&country={country}` endpoint
+1. **Start the Proxy Server**:
+   ```bash
+   # Install proxy dependencies
+   npm install express express-http-proxy cors dotenv
+
+   # Run the proxy server
+   node proxy-server.js
+   ```
+
+2. **The app will automatically detect and use the proxy** when running in development mode.
+
+3. **For Production**: Deploy the proxy server separately and update the proxy URL in `BrowserView.tsx`.
 
 ### Example Backend Implementation (Node.js/Express):
 
 ```javascript
-const express = require('express');
-const proxy = require('express-http-proxy');
-const app = express();
+import express from 'express';
+import proxy from 'express-http-proxy';
+import cors from 'cors';
 
-app.use('/api/proxy', proxy('https://your-proxy-service.com', {
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/proxy', proxy('https://cors-anywhere.herokuapp.com', {
   proxyReqPathResolver: (req) => {
     const url = req.query.url;
-    const country = req.query.country;
-    return `/proxy?url=${encodeURIComponent(url)}&country=${country}`;
+    return `/${encodeURIComponent(url)}`;
   }
 }));
 ```
 
 ### Frontend Integration:
 
-```javascript
-const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}&country=${config.location}`;
-```
+The frontend automatically detects when the proxy server is running and routes requests through it.
 
-See `PROXY_SETUP.md` and `proxy-server.js` for a complete backend implementation example.
+See `PROXY_SETUP.md` and `proxy-server.js` for complete implementation details.

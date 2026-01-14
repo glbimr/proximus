@@ -1,44 +1,49 @@
 # GeoNet Simulator - Backend Proxy Example
 
-This is an example of how to implement real IP changing for the GeoNet Simulator.
+This is an example of how to implement real IP changing for the GeoNet Simulator using open source proxy services.
 
-## Quick Start
+## Quick Start with CORS Anywhere
+
+CORS Anywhere is an open source proxy service that can bypass CORS restrictions and provide basic proxying.
 
 1. Install dependencies for the proxy server:
 ```bash
 npm install express express-http-proxy cors dotenv
+```
+Or use the provided package.json:
+```bash
+npm install --package-lock-only proxy-package.json
 ```
 
 2. Run the proxy server:
 ```bash
 node proxy-server.js
 ```
-
-3. Update your frontend to use the proxy:
-```typescript
-// In BrowserView.tsx
-const proxyUrl = `http://localhost:3001/api/proxy?url=${encodeURIComponent(url)}&location=${config.location}`;
+Or:
+```bash
+npm start
 ```
 
-## How It Works
+3. The server will proxy requests through CORS Anywhere (https://cors-anywhere.herokuapp.com)
 
-The proxy server intercepts requests and:
-- Adds `X-Forwarded-For` headers to simulate different IP addresses
-- Modifies `User-Agent` and `Accept-Language` headers based on location
-- Routes requests through different proxy endpoints (in real implementation)
-
-## Testing
+## Testing the Proxy
 
 Test the proxy server:
 ```bash
 curl "http://localhost:3001/api/proxy?url=https://httpbin.org/ip&location=Delhi,%20India"
 ```
 
-You should see the simulated IP in the response.
+You should see the response proxied through CORS Anywhere with simulated headers.
 
-## Production Deployment
+## Limitations of CORS Anywhere
 
-For production, replace the mock proxy with a real proxy service:
+- **No Real IP Changing**: CORS Anywhere runs on a single server, so all requests come from the same IP
+- **Rate Limiting**: Free service may have rate limits
+- **CORS Bypassing**: Primarily designed for CORS issues, not IP geolocation
+
+## For Real IP Changing
+
+For actual IP changing with different geographic locations, use commercial proxy services:
 
 ### Bright Data Integration Example:
 ```javascript
@@ -64,3 +69,17 @@ const response = await axios.get('https://data.oxylabs.io/v1/queries', {
   }
 });
 ```
+
+## Alternative Open Source Options
+
+1. **AllOrigins** (https://api.allorigins.win/):
+   - Returns JSON responses
+   - Good for API proxying
+
+2. **CodeTabs Proxy** (https://api.codetabs.com/v1/proxy?quest=):
+   - Simple GET proxy
+   - Limited to GET requests
+
+3. **CORS Proxy** (https://corsproxy.org/):
+   - Similar to CORS Anywhere
+   - May have different rate limits
