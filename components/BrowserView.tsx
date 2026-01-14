@@ -14,6 +14,7 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
   const [inputUrl, setInputUrl] = useState(url);
   const [deviceMode, setDeviceMode] = useState<'desktop' | 'mobile'>('desktop');
   const [proxyUrl, setProxyUrl] = useState<string | null>(null);
+  const [proxyError, setProxyError] = useState(false);
   
   useEffect(() => {
     setInputUrl(url);
@@ -22,11 +23,13 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
   // Use direct proxy service - no backend server required
   useEffect(() => {
     if (config && url) {
-      // Use CORS Proxy service - open source and functional
-      const proxyService = 'https://corsproxy.org/?';
+      // Use CodeTabs proxy service - reliable free proxy
+      const proxyService = 'https://api.codetabs.com/v1/proxy?quest=';
       setProxyUrl(`${proxyService}${encodeURIComponent(url)}`);
+      setProxyError(false);
     } else {
       setProxyUrl(null);
+      setProxyError(false);
     }
   }, [config, url]);
 
@@ -105,10 +108,15 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
                     IP: {config.ip} • {config.location}
                 </div>
                 <div className="mt-1 text-xs">
-                    {proxyUrl && proxyUrl.includes('corsproxy.org') ? (
+                    {proxyUrl && !proxyError && proxyUrl.includes('codetabs.com') ? (
                         <span className="text-green-400 flex items-center gap-1">
                             <span>✓</span>
-                            <span>Proxy Active (CORS Proxy)</span>
+                            <span>Proxy Active (CodeTabs)</span>
+                        </span>
+                    ) : proxyError ? (
+                        <span className="text-orange-400 flex items-center gap-1">
+                            <span>⚠️</span>
+                            <span>Proxy Failed - Direct Connection</span>
                         </span>
                     ) : (
                         <span className="text-yellow-400 flex items-center gap-1">
@@ -137,14 +145,14 @@ const BrowserView: React.FC<BrowserViewProps> = ({ url, setUrl, config, onRefres
             Extended permissions for WebRTC and screen sharing support within the simulated browser.
           */}
           <iframe 
-            src={proxyUrl || url}
+            src={proxyError ? url : (proxyUrl || url)}
             className="w-full h-full border-none"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-presentation allow-top-navigation-by-user-activation"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; microphone; camera; geolocation; display-capture"
             title="Simulated Browser"
             onError={() => {
               console.log("Proxy failed, falling back to direct connection");
-              // Could implement fallback logic here
+              setProxyError(true);
             }}
           />
           

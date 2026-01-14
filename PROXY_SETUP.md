@@ -2,18 +2,18 @@
 
 ## Current Implementation (Recommended)
 
-The app now uses **CORS Proxy** (https://corsproxy.org/) - a functional open source proxy service that works directly without requiring any backend setup.
+The app now uses **CodeTabs Proxy** (https://api.codetabs.com/v1/proxy) - a reliable free proxy service that works directly without requiring any backend setup.
 
 ### Features:
 - ✅ **No backend required** - works out of the box
 - ✅ **Automatic proxying** when ISP configs are selected
 - ✅ **CORS bypass** for cross-origin requests
-- ✅ **Open source** and free to use
+- ✅ **Reliable** and free to use
 
 ### How it works:
 ```javascript
 // When an ISP config is selected, URLs are automatically proxied:
-const proxyUrl = `https://corsproxy.org/?${encodeURIComponent(targetUrl)}`;
+const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
 ```
 
 ## Alternative: Backend Proxy Server
@@ -41,22 +41,28 @@ node proxy-server.js
 
 ## Alternative Proxy Services
 
-### 1. CORS Anywhere
+### 1. CodeTabs Proxy (Current)
+```javascript
+const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
+```
+**Status**: ✅ Currently in use - reliable and functional
+
+### 2. CORS Anywhere
 ```javascript
 const proxyUrl = `https://cors-anywhere.herokuapp.com/${encodeURIComponent(url)}`;
 ```
 **Note**: Requires visiting https://cors-anywhere.herokuapp.com/corsdemo to enable
 
-### 2. AllOrigins
+### 3. ThingProxy
+```javascript
+const proxyUrl = `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(url)}`;
+```
+
+### 4. AllOrigins
 ```javascript
 const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 ```
 **Note**: Returns JSON response, not suitable for iframe embedding
-
-### 3. CodeTabs Proxy
-```javascript
-const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
-```
 
 ## For Real IP Changing
 
